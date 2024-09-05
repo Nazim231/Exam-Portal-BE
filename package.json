@@ -1,0 +1,23 @@
+{
+  "name": "exam-portal",
+  "version": "1.0.0",
+  "description": "It contains the backend code of Exam Portal Application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nazim231/Exam-Portal-BE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nazim231/Exam-Portal-BE/issues"
+  },
+  "homepage": "https://github.com/Nazim231/Exam-Portal-BE#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
