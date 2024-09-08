@@ -1,10 +1,11 @@
 {
   "name": "exam-portal",
   "version": "1.0.0",
+  "type": "module",
   "description": "It contains the backend code of Exam Portal Application",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,8 @@
   },
   "homepage": "https://github.com/Nazim231/Exam-Portal-BE#readme",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mongoose": "^8.6.1",
+    "nodemon": "^3.1.4"
   }
 }
