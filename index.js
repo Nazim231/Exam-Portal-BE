@@ -8,6 +8,7 @@ connectDB();
 
 // Middleware to parse JSON requests
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 // Use routes
 app.use('/auth', authRoutes);
