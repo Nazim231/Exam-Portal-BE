@@ -1,6 +1,6 @@
 import express from 'express';
 import connectDB from './connection.js';
-import authRoutes from './routes/authRoutes.js';
+import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 // API Routes
-app.use('/auth', authRoutes);
+app.use('/auth', auth);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
