@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Nazim231/Exam-Portal-BE#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
