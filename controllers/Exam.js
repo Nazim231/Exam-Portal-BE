@@ -2,14 +2,13 @@ import Exam from '../models/exam.js';
 
 class ExamController {
     async create(req, res) {
-
         const exam = {
             title: req.title,
             duration: req.duration,
             start_date: req.start_date,
-            created_by: ''
-        }
-        Exam.create()
+            created_by: '',
+        };
+        await Exam.create(exam)
             .then((exam) => {
                 if (exam) {
                     return res.json({ message: 'Exam successfully created' });
@@ -29,4 +28,3 @@ class ExamController {
 
 const exam = new ExamController();
 export default exam;
-
