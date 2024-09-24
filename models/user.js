@@ -15,6 +15,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minlength: 6
+  },
+  role: {
+    type: String,
+    enum: ['Faculty', 'Student'],
+    default: 'Faculty'
   }
 }, { timestamps: true });
 

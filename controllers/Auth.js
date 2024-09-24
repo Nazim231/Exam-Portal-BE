@@ -1,6 +1,6 @@
-import User from "../models/user.js";
-import { auth as Authentication } from "../services/auth.js";
-import bcrypt from "bcrypt";
+import User from '../models/user.js';
+import { auth as Authentication } from '../services/auth.js';
+import bcrypt from 'bcrypt';
 
 /**
  * Manages the user authentication
@@ -12,12 +12,12 @@ class AuthController {
         if (!username || !email || !password) {
             return res
                 .status(400)
-                .json({ message: "Username/Email/Password is not provided" });
+                .json({ message: 'Username/Email/Password is not provided' });
         }
 
         if (password.length < 8 || password.length > 16) {
             return res.status(400).json({
-                message: "Password must be between 8 and 16 characters",
+                message: 'Password must be between 8 and 16 characters',
             });
         }
 
@@ -25,7 +25,7 @@ class AuthController {
             // Check if user already exists
             const existingUser = await User.findOne({ email });
             if (existingUser) {
-                return res.status(400).json({ message: "User already exists" });
+                return res.status(400).json({ message: 'User already exists' });
             }
 
             // Encrypting password
@@ -40,10 +40,10 @@ class AuthController {
             await User.create(newUser)
                 .then((user) => {
                     const sessionId = Authentication.generateAccessToken(user);
-                    res.cookie("session", sessionId);
+                    res.cookie('session', sessionId);
                     return res
                         .status(200)
-                        .json({ message: "User registered successfully" });
+                        .json({ message: 'User registered successfully' });
                 })
                 .catch((err) => {
                     return res.status(400).json({ message: err.message });
@@ -61,7 +61,7 @@ class AuthController {
         if (!email || !password) {
             return res
                 .status(400)
-                .json({ message: "Please provide email, password" });
+                .json({ message: 'Please provide email, password' });
         }
 
         // Find user by email
@@ -70,12 +70,12 @@ class AuthController {
                 if (!user || !(await bcrypt.compare(password, user.password))) {
                     return res
                         .status(400)
-                        .json({ message: "Invalid email or password" });
+                        .json({ message: 'Invalid email or password' });
                 }
                 // generating user access token for communicating with API
                 const sessionId = Authentication.generateAccessToken(user);
-                res.cookie("session", sessionId);
-                return res.status(200).json({ message: "Login successfull" });
+                res.cookie('session', sessionId);
+                return res.status(200).json({ message: 'Login successfull' });
             })
             .catch((err) => {
                 return res.status(400).json({ message: err.message });
@@ -83,5 +83,5 @@ class AuthController {
     }
 }
 
-const auth = new AuthController();
-export default auth;
+const Auth = new AuthController();
+export default Auth;
