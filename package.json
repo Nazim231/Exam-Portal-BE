@@ -1,7 +1,6 @@
 {
   "name": "exam-portal",
   "version": "1.0.0",
-  "type": "module",
   "description": "It contains the backend code of Exam Portal Application",
   "main": "index.js",
   "type": "module",
