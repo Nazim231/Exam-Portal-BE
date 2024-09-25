@@ -2,11 +2,15 @@ import Exam from '../models/exam.js';
 
 class ExamController {
     async create(req, res) {
+        if (!req.body.title || !req.body.duration || !req.body.start_date) {
+            return res.status(422).json({ message: 'Incomplete Data' });
+        }
+
         const exam = {
-            title: req.title,
-            duration: req.duration,
-            start_date: req.start_date,
-            created_by: '',
+            title: req.body.title,
+            duration: req.body.duration,
+            start_date: req.body.start_date,
+            created_by: req.user._id,
         };
         await Exam.create(exam)
             .then((exam) => {
