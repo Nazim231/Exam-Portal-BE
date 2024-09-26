@@ -15,7 +15,12 @@ class ExamController {
         await Exam.create(exam)
             .then((exam) => {
                 if (exam) {
-                    return res.json({ message: 'Exam successfully created' });
+                    return res.json({
+                        message: 'Exam successfully created',
+                        data: {
+                            id: exam._id,
+                        },
+                    });
                 } else {
                     return res.json({
                         message: 'Failed to create exam, try again',
