@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
 const examSchema = new Schema(
     {
@@ -30,5 +30,5 @@ const examSchema = new Schema(
     }
 );
 
-const Exam = model("Exam", examSchema);
+const Exam = model('exam', examSchema);
 export default Exam;

@@ -23,6 +23,6 @@ const sectionSchema = new Schema({
     },
 });
 
-const section = model('sections', sectionSchema);
+const Section = model('sections', sectionSchema);
 
-export default section;
+export default Section;
