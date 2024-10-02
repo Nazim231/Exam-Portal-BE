@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './connection.js';
 import auth from './routes/auth.js';
 import exam from './routes/exam.js';
+import getUserExams from './routes/getUserExams.js';
 import cookieParser from 'cookie-parser';
 import verifyUser from './middlewares/verifyUser.js';
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 // API Routes
 app.use('/auth', auth);
 app.use('/exam', verifyUser, exam);
+app.use('/my-exams', verifyUser, getUserExams);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
