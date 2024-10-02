@@ -19,15 +19,24 @@ class GetUserExamsController {
             }
             */
             if (!exams.length) {
-                return res.status(404).json({ message: 'No exams found for this user' });
+                return res.status(404).json({ 
+                    status: 'fail',
+                    message: 'No exams found for this user' 
+                });
             }
 
             return res.status(200).json({
+                status: 'Success',
                 message: 'Exams fetched successfully',
                 data: exams,
             });
+            
         } catch (error) {
-            return res.status(500).json({ message: 'Error fetching exams', error: error.message });
+            return res.status(500).json({ 
+                status: 'error',
+                message: 'Error fetching exams', 
+                error: error.message 
+            });
         }
     }
 }
