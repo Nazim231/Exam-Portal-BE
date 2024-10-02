@@ -24,6 +24,10 @@ const examSchema = new Schema(
             type: Schema.Types.ObjectId,
             required: true,
         },
+        // enrolled_students: { // Uncomment this if you later want to track enrolled students
+        //     type: [Schema.Types.ObjectId],
+        //     default: [],
+        // },
     },
     {
         timestamps: true,
