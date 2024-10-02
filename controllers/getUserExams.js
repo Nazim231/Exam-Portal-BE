@@ -7,7 +7,7 @@ class GetUserExamsController {
             // const userRole = req.user.role;  // Uncomment this for role-based logic
             const exams = await Exam.find({ created_by: userId });
 
-            // for role-based
+            // for role-based if want to specify that student only access the exam based on the permission have
             /*
             let exams;
             if (userRole === 'Faculty') {
