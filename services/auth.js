@@ -1,5 +1,6 @@
-import JWT from "jsonwebtoken";
-
+import JWT from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import User from '../models/user.js';
 const { sign, verify } = JWT;
 const secretKey =
   "*c<o6#[/&(9wK=eCk<3a_sGpjWvBbg3<I6;=#RZ8)9a}cE6IC9crgJd&QZB4[!";
@@ -16,9 +17,10 @@ class Auth {
   generateAccessToken(user) {
     const userData = {
       _id: user._id,
+      username: user.username,
       email: user.email,
-      password: user.password,
       role: user.role,
+      verified: user.emailVerified,
     };
 
     return sign(userData, secretKey);

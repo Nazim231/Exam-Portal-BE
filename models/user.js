@@ -11,15 +11,27 @@ const userSchema = new Schema({
     required: true,
     match: [/.+\@.+\..+/, 'Please fill a valid email address']
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
   password: {
     type: String,
     required: true,
-    minlength: 6
   },
   role: {
     type: String,
     enum: ['Faculty', 'Student'],
     default: 'Faculty'
+  },
+  otp: {
+    type: Number,
+    required: true,
+    minlength: 6,
+  },
+  otpExpiresAt: {
+    type: Date,
+    required: true
   }
 }, { timestamps: true });
 
