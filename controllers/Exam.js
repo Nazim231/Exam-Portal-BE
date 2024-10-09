@@ -2,17 +2,11 @@ import Exam from '../models/exam.js';
 
 class ExamController {
     async create(req, res) {
-        if (!req.body.title || !req.body.duration || !req.body.start_date) {
+        if (!req.body.title || !req.body.duration || !req.body.startDate) {
             return res.status(422).json({ message: 'Incomplete Data' });
         }
 
-        const exam = {
-            title: req.body.title,
-            duration: req.body.duration,
-            start_date: req.body.start_date,
-            created_by: req.user._id,
-        };
-        await Exam.create(exam)
+        await Exam.create({ ...req.body, createdBy: req.user._id })
             .then((exam) => {
                 if (exam) {
                     return res.json({
@@ -32,6 +26,28 @@ class ExamController {
                     message: err.message,
                 });
             });
+    }
+
+    async fetch(req, res) {
+        try {
+            const userId = req.user._id;
+            const userRole = req.user.role;
+
+            let exams;
+            if (userRole === 'Faculty') {
+                exams = await Exam.find({ createdBy: userId });
+            } else {
+                return res.status(403).json({ message: 'Access denied' });
+            }
+
+            if (!exams.length) {
+                return res.status(404).json({ message: 'No exams found for this user' });
+            }
+
+            return res.status(200).json({ message: 'Exams fetched successfully', data: exams });
+        } catch (error) {
+            return res.status(500).json({ message: 'Error fetching exams', error: error.message });
+        }
     }
 }
 

@@ -6,7 +6,6 @@ import connectDB from './connection.js';
 import verifyUser from './middlewares/verifyUser.js';
 import auth from './routes/auth.js';
 import exam from './routes/exam.js';
-import getUserExams from './routes/getUserExams.js';
 
 const app = express();
 
@@ -22,7 +21,6 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 // API Routes
 app.use('/auth', auth);
 app.use('/exam', verifyUser, exam);
-app.use('/my-exams', verifyUser, getUserExams);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
