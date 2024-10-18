@@ -8,5 +8,6 @@ const router = express.Router();
 router.post('/', restrictTo('Faculty'), Exam.create);
 router.get('/', Exam.fetch);
 router.use('/section', section);
+router.get('/:examId', Exam.fetchById);
 
 export default router;

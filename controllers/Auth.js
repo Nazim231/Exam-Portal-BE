@@ -80,7 +80,7 @@ class AuthController {
                     sameSite: 'Lax',
                     secure: false,
                 });
-                return res.status(200).json({ message: 'Login successfull' });
+                return res.status(200).json({ message: 'Login successfull', userStatus: user.emailVerified });
             })
             .catch((err) => {
                 return res.status(400).json({ message: err.message });
@@ -106,7 +106,6 @@ class AuthController {
                     },
                 }
             );
-            console.log(verification);
             if (verification.matchedCount === 0) {
                 return res.status(400).json({ message: 'Invalid OTP' });
             }

@@ -6,6 +6,7 @@ class ExamController {
             return res.status(422).json({ message: 'Incomplete Data' });
         }
 
+        // TODO : Title should be unique inside the exams created by single faculty.
         await Exam.create({ ...req.body, createdBy: req.user._id })
             .then((exam) => {
                 if (exam) {
@@ -29,17 +30,11 @@ class ExamController {
     }
 
     async fetch(req, res) {
+        if (req.user.role !== 'Faculty') {
+            return res.status(403).json({ message: 'Access denied' });
+        }
         try {
-            const userId = req.user._id;
-            const userRole = req.user.role;
-
-            let exams;
-            if (userRole === 'Faculty') {
-                exams = await Exam.find({ createdBy: userId });
-            } else {
-                return res.status(403).json({ message: 'Access denied' });
-            }
-
+            const exams = await Exam.find({ createdBy: req.user._id });
             if (!exams.length) {
                 return res.status(404).json({ message: 'No exams found for this user' });
             }
@@ -48,6 +43,21 @@ class ExamController {
         } catch (error) {
             return res.status(500).json({ message: 'Error fetching exams', error: error.message });
         }
+    }
+
+    async fetchById(req, res) {
+        const examId = req.params.examId;
+
+        await Exam.findById(examId)
+            .then((exam) => {
+                if (!exam) {
+                    return res.status(404).json({ message: 'No exam found with specified id' });
+                }
+                return res.status(200).json({ message: 'Exam found', data: exam });
+            })
+            .catch((err) => {
+                return res.status(500).json({ message: 'Error fetching exam', error: err.message });
+            });
     }
 }
 
