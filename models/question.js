@@ -14,13 +14,15 @@ const questionSchema = new Schema({
         enum: ['mcq', 'fill'],
         required: true,
     },
-    options: [
-        {
-            option: {
-                type: String,
+    options: {
+        type: [String],
+        validate: {
+            validator: function (value) {
+                return this.type !== 'mcq' || (value && value.length > 0);
             },
+            message: (props) => `Options are required for MCQ`,
         },
-    ],
+    },
     correctAns: {
         type: String,
         required: true,

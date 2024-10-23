@@ -4,6 +4,6 @@ import quesRoutes from './question.js';
 
 const router = express.Router();
 
-router.post('/create', Section.create);
+router.post('/create', (req, res) => Section.create(req, res));
 router.use('/question', quesRoutes);
 export default router;

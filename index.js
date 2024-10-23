@@ -6,6 +6,7 @@ import connectDB from './connection.js';
 import verifyUser from './middlewares/verifyUser.js';
 import auth from './routes/auth.js';
 import exam from './routes/exam.js';
+import logRequest from './middlewares/logRequest.js';
 
 const app = express();
 
@@ -13,6 +14,7 @@ connectDB();
 configDotenv();
 
 // Middleware to parse JSON requests
+app.use(logRequest);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
