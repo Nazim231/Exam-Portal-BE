@@ -41,7 +41,7 @@ class AuthController {
             await User.create(newUser)
                 .then((user) => {
                     const sessionId = Authentication.generateAccessToken(user);
-                    res.cookie('session', sessionId, { httpOnly: true, secure: false, sameSite: 'None' });
+                    res.cookie('session', sessionId, { httpOnly: true, secure: false, sameSite: 'Lax' });
                     mail.sendMail(
                         user.email,
                         user.username,
@@ -77,10 +77,10 @@ class AuthController {
                 const sessionId = Authentication.generateAccessToken(user);
                 res.cookie('session', sessionId, {
                     httpOnly: true,
-                    sameSite: 'None',
+                    sameSite: 'Lax',
                     secure: false,
                 });
-                return res.status(200).json({ message: 'Login successfull' });
+                return res.status(200).json({ message: 'Login successfull', userStatus: user.emailVerified });
             })
             .catch((err) => {
                 return res.status(400).json({ message: err.message });
@@ -106,7 +106,6 @@ class AuthController {
                     },
                 }
             );
-            console.log(verification);
             if (verification.matchedCount === 0) {
                 return res.status(400).json({ message: 'Invalid OTP' });
             }
@@ -144,6 +143,11 @@ class AuthController {
         } catch (err) {
             return res.status(400).json({ message: err });
         }
+    }
+
+    logout(req, res) {
+        res.clearCookie('session', { httpOnly: true, secure: false, sameSite: 'Lax' });
+        return res.json({ message: 'logged out' });
     }
 }
 

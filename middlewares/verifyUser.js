@@ -21,7 +21,7 @@ export default function verifyUser(req, res, next) {
 
     const user = Authentication.validateToken(token);
     if (!user) {
-        res.clearCookie('session', { httpOnly: true, secure: false, sameSite: 'None' });
+        res.clearCookie('session', { httpOnly: true, secure: false, sameSite: 'Lax' });
         return res.status(401).json({ message: 'Unauthenticated' });
     }
 

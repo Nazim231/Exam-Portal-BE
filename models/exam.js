@@ -11,16 +11,24 @@ const examSchema = new Schema(
             type: Number,
             required: true,
         },
-        start_date: {
+        startDate: {
             type: Date,
             required: true,
+            validate: {
+                validator: (val) => {
+                    const now = new Date();
+                    const validatedTime = new Date(now.getTime() + 30 * 60000);
+                    return val >= validatedTime;
+                },
+                message: 'Exam starting time should be at least 30 min greater than current time',
+            },
         },
         status: {
             type: String,
             enum: ['Scheduled', 'Postponed', 'In Progress', 'Finished'],
             default: 'Scheduled',
         },
-        created_by: {
+        createdBy: {
             type: Schema.Types.ObjectId,
             required: true,
         },

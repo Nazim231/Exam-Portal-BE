@@ -17,7 +17,7 @@ const sectionSchema = new Schema({
         type: Number,
         required: true,
     },
-    num_questions: {
+    num_question: {
         type: Number,
         required: true,
     },
