@@ -24,14 +24,16 @@ const userSchema = new Schema({
     enum: ['Faculty', 'Student'],
     default: 'Faculty'
   },
+  exams: {
+    type: [Schema.Types.ObjectId],
+    default: [],
+  },
   otp: {
     type: Number,
-    required: true,
     minlength: 6,
   },
   otpExpiresAt: {
     type: Date,
-    required: true
   }
 }, { timestamps: true });
 
