@@ -14,7 +14,6 @@ export default function restrictTo(role) {
 
         if (Array.isArray(role)) {
             for (const r of role) {
-                console.log(r, req.user.role);
                 if (req.user.role === r) return next();
             };
         }
