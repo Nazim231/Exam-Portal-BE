@@ -25,7 +25,7 @@ export default function verifyUser(req, res, next) {
         return res.status(401).json({ message: 'Unauthenticated' });
     }
 
-    if (!user.verified && !['/verify-email', '/resend-email'].includes(req.url)) {
+    if (!user.verified && !['/verify-email', '/resend-email', '/logout'].includes(req.url)) {
         return res.status(401).json({ message: 'User not verified' });
     }
 

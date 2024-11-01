@@ -4,6 +4,16 @@ import Question from '../models/question.js';
 import mongoose from 'mongoose';
 
 class SectionController {
+    async get(req, res) {
+        const examId = req.params.examId;
+        try {
+            const sections = await section.find({ exam_id: examId });
+            return res.json({ data: sections });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+
     async create(req, res) {
         const { examId, data } = req.body;
 
