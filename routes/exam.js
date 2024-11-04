@@ -13,4 +13,5 @@ router.use('/section', section);
 router.get('/:examId', Exam.fetchById);
 router.get('/:examId/section', Section.get);
 router.get('/:examId/examinees',Examinee.get );
+router.post('/attempt-exam', Examinee.attemptExam);
 export default router;

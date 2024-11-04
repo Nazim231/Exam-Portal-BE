@@ -56,11 +56,15 @@ class ExamController {
                     {
                         $project: {
                             _id: 0,
+                            examId: '$exams._id',
                             examName: '$exams.title',
                             startDate: '$exams.startDate',
                             duration: '$exams.duration',
                         },
                     },
+                    {
+                        $sort: {startDate: -1}
+                    }
                 ]);
                 return res.json({ data: exams });
             }
