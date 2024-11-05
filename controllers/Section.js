@@ -146,6 +146,46 @@ class SectionController {
         });
     }
 
+    async submit(req, res) {
+        const { data } = req.body;
+
+        await User.updateOne(
+            {
+                _id: new mongoose.Types.ObjectId(req.user._id),
+                'attempted.sections.sectionId': new mongoose.Types.ObjectId(
+                    data.sectionId
+                ),
+            },
+            {
+                $set: {
+                    'attempted.$[exam].sections.$[section].status': 'attempted',
+                },
+            },
+            {
+                arrayFilters: [
+                    { 'exam.examId': new mongoose.Types.ObjectId(data.examId) },
+                    {
+                        'section.sectionId': new mongoose.Types.ObjectId(
+                            data.sectionId
+                        ),
+                    },
+                ],
+            }
+        )
+            .then((result) => {
+                if (result.modifiedCount > 0) {
+                    return res.json({ message: 'Section marked as attempted' });
+                } else {
+                    return res
+                        .status(400)
+                        .json({ message: 'Failed to finish the section' });
+                }
+            })
+            .catch((err) => {
+                return res.status(500).json({ message: err.message });
+            });
+    }
+
     async rollbackChanges(sectionIds) {
         if (sectionIds.length == 0) return;
 
