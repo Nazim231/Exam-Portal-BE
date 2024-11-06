@@ -11,7 +11,9 @@ class AuthController {
     async register(req, res) {
         const { username, email, password } = req.body;
         if (!username || !email || !password) {
-            return res.status(400).json({ message: 'Username/Email/Password is not provided' });
+            return res
+                .status(400)
+                .json({ message: 'Username/Email/Password is not provided' });
         }
 
         if (password.length < 8 || password.length > 16) {
@@ -41,14 +43,20 @@ class AuthController {
             await User.create(newUser)
                 .then((user) => {
                     const sessionId = Authentication.generateAccessToken(user);
-                    res.cookie('session', sessionId, { httpOnly: true, secure: false, sameSite: 'Lax' });
+                    res.cookie('session', sessionId, {
+                        httpOnly: true,
+                        secure: false,
+                        sameSite: 'Lax',
+                    });
                     mail.sendMail(
                         user.email,
                         user.username,
                         'Verify your Email',
                         generateEmailHTML(user.username, user.otp)
                     );
-                    return res.status(200).json({ message: 'User registered successfully' });
+                    return res
+                        .status(200)
+                        .json({ message: 'User registered successfully' });
                 })
                 .catch((err) => {
                     return res.status(400).json({ message: err.message });
@@ -64,14 +72,18 @@ class AuthController {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: 'Please provide email, password' });
+            return res
+                .status(400)
+                .json({ message: 'Please provide email, password' });
         }
 
         // Find user by email
         await User.findOne({ email })
             .then(async (user) => {
                 if (!user || !(await bcrypt.compare(password, user.password))) {
-                    return res.status(401).json({ message: 'Invalid email or password' });
+                    return res
+                        .status(401)
+                        .json({ message: 'Invalid email or password' });
                 }
                 // generating user access token for communicating with API
                 const sessionId = Authentication.generateAccessToken(user);
@@ -80,7 +92,14 @@ class AuthController {
                     sameSite: 'Lax',
                     secure: false,
                 });
-                return res.status(200).json({ message: 'Login successfull', userStatus: user.emailVerified });
+                const userData = {
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                    exams: user.exams,
+                    verified: user.emailVerified,
+                };
+                return res.status(200).json({ message: 'Login successfull', userData });
             })
             .catch((err) => {
                 return res.status(400).json({ message: err.message });
@@ -95,7 +114,11 @@ class AuthController {
         }
         try {
             const verification = await User.updateOne(
-                { email: req.user.email, otp: otp, otpExpiresAt: { $gt: new Date() } },
+                {
+                    email: req.user.email,
+                    otp: otp,
+                    otpExpiresAt: { $gt: new Date() },
+                },
                 {
                     $set: {
                         emailVerified: true,
@@ -109,7 +132,10 @@ class AuthController {
             if (verification.matchedCount === 0) {
                 return res.status(400).json({ message: 'Invalid OTP' });
             }
-            const token = Authentication.generateAccessToken({ ...req.user, verified: true });
+            const token = Authentication.generateAccessToken({
+                ...req.user,
+                verified: true,
+            });
             res.cookie('session', token);
             return res.json({ message: 'OTP Verified' });
         } catch (err) {
@@ -131,7 +157,9 @@ class AuthController {
             );
 
             if (udpatedUserOTP.matchedCount == 0) {
-                return res.status(400).json({ message: 'Failed to send mail, try again later' });
+                return res
+                    .status(400)
+                    .json({ message: 'Failed to send mail, try again later' });
             }
             mail.sendMail(
                 req.user.email,
@@ -146,7 +174,11 @@ class AuthController {
     }
 
     logout(req, res) {
-        res.clearCookie('session', { httpOnly: true, secure: false, sameSite: 'Lax' });
+        res.clearCookie('session', {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Lax',
+        });
         return res.json({ message: 'logged out' });
     }
 }
