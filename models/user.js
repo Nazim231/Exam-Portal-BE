@@ -21,11 +21,20 @@ const sectionSchema = new Schema({
     sectionId: {
         type: Schema.Types.ObjectId,
     },
+    status: {
+        type: String,
+        enum: ['attempted', 'unattempted'],
+        default: 'unattempted'
+    },
     questions: [questionSchema],
 });
 
 const examSchema = new Schema({
     examId: Schema.Types.ObjectId,
+    status: {
+        type: String,
+        default: 'unattempted'
+    },
     sections: [sectionSchema],
 });
 

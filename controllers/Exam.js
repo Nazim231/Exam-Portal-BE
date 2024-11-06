@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Exam from '../models/exam.js';
 import User from '../models/user.js';
 
@@ -63,8 +64,8 @@ class ExamController {
                         },
                     },
                     {
-                        $sort: {startDate: -1}
-                    }
+                        $sort: { startDate: -1 },
+                    },
                 ]);
                 return res.json({ data: exams });
             }
@@ -106,6 +107,282 @@ class ExamController {
                     error: err.message,
                 });
             });
+    }
+
+    async markAsAttempted(req, res) {
+        const examId = req.params.examId;
+
+        if (!examId) {
+            return res.status(400).json({ message: 'Exam ID not provided' });
+        }
+
+        try {
+            const response = await User.updateOne(
+                {
+                    _id: new mongoose.Types.ObjectId(req.user._id),
+                    'attempted.examId': new mongoose.Types.ObjectId(examId),
+                },
+                {
+                    $set: {
+                        'attempted.$.status': 'attempted',
+                    },
+                }
+            );
+            console.log(response);
+            if (response.modifiedCount > 0) {
+                return res.json({ message: 'Exam successfully submitted' });
+            } else {
+                return res
+                    .status(400)
+                    .json({ message: 'Failed to submit exam' });
+            }
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+
+    async attemptedExams(req, res) {
+        try {
+            const response = await User.aggregate([
+                {
+                    $match: { _id: new mongoose.Types.ObjectId(req.user._id) },
+                },
+                {
+                    $unwind: '$attempted',
+                },
+                {
+                    $lookup: {
+                        from: 'exams',
+                        foreignField: '_id',
+                        localField: 'attempted.examId',
+                        as: 'examDetails',
+                    },
+                },
+                {
+                    $unwind: '$examDetails',
+                },
+                {
+                    $project: {
+                        examId: '$examDetails._id',
+                        status: '$attempted.status',
+                        title: '$examDetails.title',
+                        attemptedOn: '$examDetails.startDate',
+                        duration: '$examDetails.duration',
+                    },
+                },
+            ]);
+            if (response.length == 0) {
+                return res.json({ message: 'No exams attempted yet' });
+            }
+
+            return res.json({
+                message: 'Attempted Exams Fetched',
+                data: response,
+            });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+
+    async result(req, res) {
+        const examId = req.params.examId;
+        if (!examId) {
+            return res.status(400).json({ message: 'Exam ID not found' });
+        }
+
+        try {
+            const response = await User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(req.user._id),
+                    },
+                },
+                {
+                    $unwind: '$attempted',
+                },
+                {
+                    $match: {
+                        'attempted.examId': new mongoose.Types.ObjectId(examId),
+                    },
+                },
+                {
+                    $unwind: '$attempted.sections',
+                },
+                {
+                    $unwind: '$attempted.sections.questions',
+                },
+                {
+                    $group: {
+                        _id: null,
+                        attemptedCount: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            '$attempted.sections.questions.status',
+                                            'attempted',
+                                        ],
+                                    },
+                                    1,
+                                    0,
+                                ],
+                            },
+                        },
+                        skippedCount: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            '$attempted.sections.questions.status',
+                                            'skipped',
+                                        ],
+                                    },
+                                    1,
+                                    0,
+                                ],
+                            },
+                        },
+                        unattemptedCount: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            '$attempted.sections.questions.status',
+                                            'unattempted',
+                                        ],
+                                    },
+                                    1,
+                                    0,
+                                ],
+                            },
+                        },
+                        correctCount: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            '$attempted.sections.questions.result',
+                                            'correct',
+                                        ],
+                                    },
+                                    1,
+                                    0,
+                                ],
+                            },
+                        },
+                    },
+                },
+            ]);
+            return res.json({ message: 'Result Fetched', data: response });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+
+    async detailedReport(req, res) {
+
+        const examId = req.params.examId;
+
+        try {
+            const response = await User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(req.user._id),
+                        'attempted.examId': new mongoose.Types.ObjectId(examId),
+                    },
+                },
+                {
+                    $unwind: '$attempted',
+                },
+                {
+                    $match: {
+                        'attempted.status': 'attempted',
+                    },
+                },
+                {
+                    $unwind: '$attempted.sections',
+                },
+                {
+                    $lookup: {
+                        from: 'questions',
+                        let: {
+                            questionIds:
+                                '$attempted.sections.questions.questionId',
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $in: ['$_id', '$$questionIds'] },
+                                },
+                            },
+                        ],
+                        as: 'questionDetails',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'sections',
+                        localField: 'attempted.sections.sectionId',
+                        foreignField: '_id',
+                        as: 'sectionDetails',
+                    },
+                },
+                {
+                    $unwind: '$sectionDetails',
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        section: {
+                            title: '$sectionDetails.title',
+                            questions: {
+                                $map: {
+                                    input: '$attempted.sections.questions',
+                                    as: 'userQuestion',
+                                    in: {
+                                        title: {
+                                            $let: {
+                                                vars: {
+                                                    matchedQuestion: {
+                                                        $arrayElemAt: [
+                                                            {
+                                                                $filter: {
+                                                                    input: '$questionDetails',
+                                                                    as: 'q',
+                                                                    cond: {
+                                                                        $eq: [
+                                                                            '$$q._id',
+                                                                            '$$userQuestion.questionId',
+                                                                        ],
+                                                                    },
+                                                                },
+                                                            },
+                                                            0,
+                                                        ],
+                                                    },
+                                                },
+                                                in: {
+                                                    $ifNull: [
+                                                        '$$matchedQuestion.title',
+                                                        'No Title',
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        status: '$$userQuestion.status',
+                                        result: '$$userQuestion.result',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ]);
+            console.log(response);
+            return res.json({ data: response, message: 'Details Fetched' });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
     }
 }
 
