@@ -11,7 +11,38 @@ class SectionController {
             const sections = await section
                 .find({ exam_id: examId })
                 .sort({ rank: 1 });
-            return res.json({ data: sections });
+
+            const responseData = {
+                message: 'Sections Fetched',
+                data: sections,
+            };
+
+            if (req.user.role.toLowerCase() == 'student') {
+                var attendedSections = await User.aggregate([
+                    {
+                        $match: {
+                            _id: new mongoose.Types.ObjectId(req.user._id),
+                            'attempted.examId': new mongoose.Types.ObjectId(
+                                examId
+                            ),
+                        },
+                    },
+                    {
+                        $project: {
+                            sections: '$attempted.sections',
+                            examId: '$attempted.examId',
+                        },
+                    },
+                    {
+                        $unwind: '$sections',
+                    },
+                ]);
+                responseData['attendedSections'] = attendedSections[0].sections;
+            }
+
+            console.log(responseData);
+
+            return res.json(responseData);
         } catch (err) {
             return res.status(500).json({ message: err.message });
         }
